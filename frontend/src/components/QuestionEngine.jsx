@@ -27,34 +27,41 @@ export default function QuestionEngine() {
     axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, { withCredentials: true })
       .then(async (res) => {
         const userData = res.data;
+        if (!userData || !userData.h) {
+          nv('/');
+          return;
+        }
         setU(userData);
         
-        const cfRes = await axios.get(`https://codeforces.com/api/user.status?handle=${userData.h}`);
-        const subs = cfRes.data.result.filter(s => s.verdict === 'OK');
-        const solved = new Set();
-        const ratingCounts = {};
-        
-        subs.forEach(s => {
-          if (!s.problem.rating) return;
-          const pid = `${s.problem.contestId}-${s.problem.index}`;
-          if (!solved.has(pid)) {
-            solved.add(pid);
-            ratingCounts[s.problem.rating] = (ratingCounts[s.problem.rating] || 0) + 1;
-          }
-        });
+        try {
+          const cfRes = await axios.get(`https://codeforces.com/api/user.status?handle=${userData.h}`);
+          const subs = cfRes.data.result.filter(s => s.verdict === 'OK');
+          const solved = new Set();
+          const ratingCounts = {};
+          
+          subs.forEach(s => {
+            if (!s.problem.rating) return;
+            const pid = `${s.problem.contestId}-${s.problem.index}`;
+            if (!solved.has(pid)) {
+              solved.add(pid);
+              ratingCounts[s.problem.rating] = (ratingCounts[s.problem.rating] || 0) + 1;
+            }
+          });
 
-        const base = userData.mxR ? Math.floor(userData.mxR / 100) * 100 : 1200;
-        const t1 = Math.max(base + 100, 800);
-        const t2 = Math.max(base + 200, 900);
-        const c1 = ratingCounts[t1] || 0;
-        
-        const recommended = c1 < 35 ? t1 : t2;
-        setRecR(recommended);
-        setSelR(recommended);
+          const base = userData.mxR ? Math.floor(userData.mxR / 100) * 100 : 1200;
+          const t1 = Math.max(base + 100, 800);
+          const t2 = Math.max(base + 200, 900);
+          const c1 = ratingCounts[t1] || 0;
+          
+          const recommended = c1 < 35 ? t1 : t2;
+          setRecR(recommended);
+          setSelR(recommended);
+        } catch (cfErr) {
+          console.error("Codeforces API failed, but user is still logged in.");
+        }
       })
       .catch(() => nv('/'));
   }, [nv]);
-
   useEffect(() => {
     let t; if (sCd > 0) t = setInterval(() => setSCd(c => c - 1), 1000);
     return () => clearInterval(t);
@@ -67,7 +74,7 @@ export default function QuestionEngine() {
     setAiMode(null); setAiRes(""); setUserCode("");
 
     try {
-     const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/problem/${handle}?rating=${targetRating}&ignore=${ignoreList.join(',')}`, { withCredentials: true });
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/problem/${handle}?rating=${targetRating}&ignore=${ignoreList.join(',')}`, { withCredentials: true });
       setP(data);
     } catch (e) {
       setErr(e.response?.data?.error || "Failed to fetch target problem.");
