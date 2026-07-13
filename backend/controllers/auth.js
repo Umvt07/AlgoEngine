@@ -5,16 +5,14 @@ import User from '../models/user.models.js';
 const REDIRECT_URI = `${process.env.BACKEND_URL}/api/auth/callback`;
 
 export const cfLogin = (req, res) => {
-   
 
-    const CF_CLIENT_ID = process.env.CF_CLIENT_ID;
+    const REDIRECT_URI = `${process.env.BACKEND_URL}/api/auth/callback`;
 
     const authUrl =
-      `https://codeforces.com/oauth/authorize?client_id=${CF_CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=openid`;
+      `https://codeforces.com/oauth/authorize?client_id=${process.env.CF_CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=openid`;
 
-   
-    res.redirect(authUrl);
-};
+    res.redirect(authUrl);   
+}
 
 export const cfCallback = async (req, res) => {
 
