@@ -11,7 +11,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     // 1. Verify the user
-    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`)
+    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, { withCredentials: true })
       .then(authRes => {
         const validUser = authRes.data;
         if (!validUser || !validUser.h) {
@@ -66,7 +66,7 @@ export default function Dashboard() {
 
   const out = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (e) {
       console.error("Logout failed on server", e);
     } finally {
