@@ -29,7 +29,7 @@ export default function QuestionEngine() {
         const userData = res.data;
         setU(userData);
         
-        const cfRes = await axios.get(`https://codeforces.com/api/user.status?handle=${userData.h}`, { withCredentials: false });
+        const cfRes = await axios.get(`https://codeforces.com/api/user.status?handle=${userData.h}`);
         const subs = cfRes.data.result.filter(s => s.verdict === 'OK');
         const solved = new Set();
         const ratingCounts = {};
@@ -67,7 +67,7 @@ export default function QuestionEngine() {
     setAiMode(null); setAiRes(""); setUserCode("");
 
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/users/problem/${handle}?rating=${targetRating}&ignore=${ignoreList.join(',')}`, { withCredentials: true });
+     const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/problem/${handle}?rating=${targetRating}&ignore=${ignoreList.join(',')}`, { withCredentials: true });
       setP(data);
     } catch (e) {
       setErr(e.response?.data?.error || "Failed to fetch target problem.");
