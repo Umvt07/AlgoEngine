@@ -70,7 +70,7 @@ export const getContestRecommendation = async (req, res) => {
     );
 
     let minTarget = baseRating - 100;
-    let maxTarget = baseRating + 200;
+    let maxTarget = baseRating + 300;
     minTarget=Math.max(800,minTarget);
     maxTarget=Math.max(900,maxTarget);
     const problemsByContest = {};
